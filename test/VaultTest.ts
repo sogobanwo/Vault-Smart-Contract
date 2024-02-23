@@ -16,26 +16,32 @@ describe("VaultTest", function () {
     const [owner, otherAccount] = await ethers.getSigners();
 
     const VaultContract = await ethers.getContractFactory("VaultContract");
+
     const vaultContract = await VaultContract.deploy();
 
     return { vaultContract, owner, otherAccount };
   }
 
   describe("DonateGrant", function () {
+
     it("It should return with an error message when 0 value is inputed ", async function () {
+
       const { vaultContract, otherAccount } = await loadFixture(deployVaultContract);
 
       await expect(vaultContract.donateGrant(otherAccount, 20, {value: 0})).to.be.revertedWith("Can't save 0 value");
     });
 
     it("It should not return with an error message when a value higher than 0 is inputed", async function () {
+
       const { vaultContract, otherAccount } = await loadFixture(deployVaultContract);
 
       await expect(vaultContract.donateGrant(otherAccount, 20, {value: 1})).to.not.be.revertedWith("Can't save 0 value");
     });
 
     it("The contract balance should be equal to amount deposit", async function () {
+
       const { vaultContract, otherAccount } = await loadFixture(deployVaultContract);
+
       (await vaultContract.donateGrant(otherAccount, 20, {value: 1})).wait();
 
       expect(await ethers.provider.getBalance(vaultContract.target)).to.equal(1);
@@ -44,12 +50,14 @@ describe("VaultTest", function () {
 
   describe("claimGrant", function () {
     it("It should be reverted with an error if the address has no grant", async function () {
+
       const { vaultContract, otherAccount } = await loadFixture(deployVaultContract);
 
       await expect(vaultContract.claimGrant(1)).to.be.revertedWith("You don't have any grant");
     });
 
     it("It should be reverted with an error if time of maturity has not ellapsed", async function () {
+      
       const { vaultContract, otherAccount } = await loadFixture(deployVaultContract);
 
       (await vaultContract.donateGrant(otherAccount, 1000, {value: 1})).wait();
@@ -59,6 +67,7 @@ describe("VaultTest", function () {
     });
 
     it("The contract balance should be equal to amount deposit", async function () {
+
       const { vaultContract, otherAccount } = await loadFixture(deployVaultContract);
 
       (await vaultContract.donateGrant(otherAccount, 10, {value: 1})).wait();
