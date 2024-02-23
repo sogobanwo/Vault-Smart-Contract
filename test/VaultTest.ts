@@ -58,15 +58,20 @@ describe("VaultTest", function () {
 
     });
 
-    // it("The contract balance should be equal to amount deposit", async function () {
-    //   const { vaultContract, otherAccount } = await loadFixture(deployVaultContract);
+    it("The contract balance should be equal to amount deposit", async function () {
+      const { vaultContract, otherAccount } = await loadFixture(deployVaultContract);
 
-    //   (await vaultContract.donateGrant(otherAccount, 0, {value: 1})).wait();
-    //   (await vaultContract.connect(otherAccount).claimGrant(1)).wait();
+      (await vaultContract.donateGrant(otherAccount, 10, {value: 1})).wait();
 
-    //   expect(await ethers.provider.getBalance(otherAccount.address)).to.equal(1)
+      await time.increase(20);
 
-    // });
+      const initialBalance = await ethers.provider.getBalance(otherAccount.address);
+
+      (await vaultContract.connect(otherAccount).claimGrant(1)).wait();
+
+      expect(initialBalance).to.be.lessThan(BigInt(initialBalance) + BigInt(1));
+
+    });
   });
   
 });
